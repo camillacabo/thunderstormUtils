@@ -1,31 +1,30 @@
 const thunderstormActive = new Image("thunderstormActive.png", "https://inspektur.net/assets/thunderstormActive.png");
 const thunderstormInactive = new Image("thunderstormInactive.png", "https://inspektur.net/assets/thunderstormInactive.png");
 
-function secsToTime(num) {
-    var hours = Math.floor(num / 3600);
-    var minutes = Math.floor((num - (hours * 3600)) / 60);
-    var seconds = num - (hours * 3600) - (minutes * 60);
-    if (hours < 10) { hours = "0" + hours; }
-    if (minutes < 10) { minutes = "0" + minutes; }
-    if (seconds < 10) { seconds = "0" + seconds; }
-    return hours + ':' + minutes + ':' + seconds;
-}
+function secsToTime(num) { return new Date(seconds * 1000).toISOString().slice(11, 19); }
 
-const UTCPrevThunderstorm = 1668474356000;
+const cooldown = 2400;
+const duration = 1200;
+const thunderstormInterval = 3;
 
 register("renderOverlay", () => {
-    const UTCNow = new Date().getTime();
-    const base = Math.floor((UTCNow - UTCPrevThunderstorm) / 1000);
-    const thunderstorm = base % ((3850 + 1000) * 4);
+    const timestamp = Math.floor(Date.now() / 1000);
+    const skyblockAge = (timestamp - 1560275700);
+    const thunderstorm = skyblockAge % ((cooldown + duration) * thunderstormInterval);
+    const rain = skyblockAge % (cooldown + duration);
 
-    // thunderstorm not occuring
-    if (thunderstorm < (3850 * 4 + 1000 * 3)) { 
-        Renderer.drawString(secsToTime(3850 * 4 + 1000 * 3 - thunderstorm), 30, 33.5);
-        thunderstormActive.draw(5, 25, 25, 25);
-    }
     // thunderstorm taking place
-    else { 
-        Renderer.drawString(secsToTime(3850 * 4 + 1000 * 4 - thunderstorm), 30, 33.5);
+    if ((cooldown <= thunderstorm) && (thunderstorm < (cooldown + duration))) { 
+        let timeLeft = (cooldown + duration) - rain;
+        Renderer.drawString(secsToTime(timeLeft), 30, 33.5);
         thunderstormInactive.draw(5, 25, 25, 25);
+    }
+    // thunderstorm not occuring
+    else { 
+        let nextThunderstorm;
+        if (thunderstorm < cooldown) {nextThunderstorm = cooldown - thunderstorm; } 
+        else if ((cooldown + duration) <= thunderstorm) { nextThunderstorm = ((cooldown + duration) * thunderstormInterval) - thunderstorm + cooldown; }
+        Renderer.drawString(secsToTime(nextThunderstorm), 30, 33.5);
+        thunderstormActive.draw(5, 25, 25, 25);
     }
 });
