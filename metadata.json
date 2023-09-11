@@ -1,0 +1,7 @@
+{
+    "name": "thunderstormUtils",
+    "creator": "Maltthe",
+    "description": "on screen display for next thunderstorm",
+    "version": "1.0.0",
+    "entry": "index.js"
+}
