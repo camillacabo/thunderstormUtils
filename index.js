@@ -3,6 +3,8 @@ const thunderstormInactive = new Image("thunderstormInactive.png", "https://insp
 
 function secsToTime(num) { return new Date(seconds * 1000).toISOString().slice(11, 19); }
 
+const notifier = false;
+
 const cooldown = 2400;
 const duration = 1200;
 const thunderstormInterval = 3;
@@ -18,6 +20,11 @@ register("renderOverlay", () => {
         let timeLeft = (cooldown + duration) - rain;
         Renderer.drawString(secsToTime(timeLeft), 30, 33.5);
         thunderstormInactive.draw(5, 25, 25, 25);
+
+        if (notifier == true) {
+            showTitle("§c! ACTIVE THUNDERSTORM !", "§c" + secsToTime(timeLeft) + " REMAINING", 0, 4, 0);
+            notifier = false;
+        }
     }
     // thunderstorm not occuring
     else { 
